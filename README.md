@@ -3,7 +3,7 @@
   Remove advertising, disable data collection, annoying notifications, default apps and more. Ideal for fresh installs of Windows 10 and those looking to purify their current installation.
 </p>
 <h3 align="center">
-  <a href="https://github.com/Carlmundo/W10-Cleanser/releases/latest">Download</a>
+  <a href="https://github.com/Carlmundo/W10-Cleanser/archive/W10-Cleanser.zip">Download</a>
 </h3>
 <div>
 <p align="center">Once downloaded, extract the zip file and run the "Start" file to automatically cleanse.</p>
