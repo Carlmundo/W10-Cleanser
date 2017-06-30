@@ -58,8 +58,7 @@ echo:
 
 echo Removing Default Apps
 echo ==========================
-powershell -command "& {&'Set-ExecutionPolicy' RemoteSigned}"
-powershell ".\scripts\apps.ps1"
+powershell -executionpolicy bypass -file ".\scripts\apps.ps1"
 echo [Complete]
 
 REM echo :
