@@ -26,6 +26,5 @@
 <p>Other changes made:</p>
 <ul>
 <li>Windows Update will now only use peer to peer connections on the local network</li>
-<li>Microsoft Edge default search engine set to Google UK</li>
 </ul>
 </div>
