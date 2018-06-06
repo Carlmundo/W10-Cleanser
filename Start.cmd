@@ -58,6 +58,7 @@ echo:
 
 echo Removing Default Apps
 echo ==========================
+echo This may take a few moments...
 powershell -executionpolicy bypass -file ".\scripts\apps.ps1"
 echo [Complete]
 

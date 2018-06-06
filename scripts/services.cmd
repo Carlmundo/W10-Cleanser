@@ -1,5 +1,6 @@
 set service[0]=DiagTrack
 set service[1]=dmwappushservice
+set service[2]=diagnosticshub.standardcollector.service
 
 set "x=0"
 
