@@ -51,7 +51,6 @@ echo - Location services
 echo:
 echo These changes have also been made:
 echo - Windows Update will now only use peer to peer connections on the local network
-echo - Microsoft Edge default search engine set to Google UK
 echo:
 echo [Complete]
 echo:
