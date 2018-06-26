@@ -33,9 +33,9 @@ $apps = @(
     "Microsoft.WindowsSoundRecorder"
     #"Microsoft.WindowsStore"
     #"Microsoft.XboxApp"
-    "Microsoft.XboxGameOverlay"
-    "Microsoft.XboxIdentityProvider"
-    "Microsoft.XboxSpeechToTextOverlay"
+    #"Microsoft.XboxGameOverlay"
+    #"Microsoft.XboxIdentityProvider"
+    #"Microsoft.XboxSpeechToTextOverlay"
     "Microsoft.ZuneMusic"
     "Microsoft.ZuneVideo"
     
@@ -100,8 +100,6 @@ $apps = @(
     #"Microsoft.MicrosoftEdge"
     #"Microsoft.Windows.Cortana"
     #"Microsoft.WindowsFeedback"
-    #"Microsoft.XboxGameCallableUI"
-    #"Microsoft.XboxIdentityProvider"
     #"Windows.ContactSupport"
 
     #Added by W10 Cleanser
