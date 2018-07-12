@@ -114,6 +114,6 @@ foreach ($app in $apps) {
     }
     if ($appInstalled -eq $true){
         Write-Output "Removing App: $app"   
-        Get-AppxPackage -Name $app -AllUsers | Remove-AppxPackage -AllUsers
+        Get-AppxPackage -Name $app -AllUsers | Remove-AppxPackage
     }
 }
