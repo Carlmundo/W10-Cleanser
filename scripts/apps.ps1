@@ -39,7 +39,6 @@ $apps = @(
     "Microsoft.ZuneMusic"
     "Microsoft.ZuneVideo"
     
-    
     # Threshold 2 apps
     "Microsoft.CommsPhone"
     "Microsoft.ConnectivityStore"
@@ -60,7 +59,6 @@ $apps = @(
     "Microsoft.BingHealthAndFitness"
     "Microsoft.WindowsReadingList"
 
-
     # non-Microsoft
     "9E2F88E3.Twitter"
     "PandoraMediaInc.29680B314EFC2"
@@ -68,7 +66,6 @@ $apps = @(
     "ShazamEntertainmentLtd.Shazam"
     "king.com.CandyCrushSaga"
     "king.com.CandyCrushSodaSaga"
-    "king.com.*"
     "ClearChannelRadioDigital.iHeartRadio"
     "4DF9E0F8.Netflix"
     "6Wunderkinder.Wunderlist"
@@ -109,13 +106,14 @@ $apps = @(
 )
 
 foreach ($app in $apps) {
-    $appInstalled = Get-AppxPackage $app | % {$_.name -eq $app}
+    $appInstalled = Get-AppxPackage $app | % {$_.Name -eq $app}
+    $appProvisioned = Get-AppXProvisionedPackage -Online | % {$_.DisplayName -eq $app}
+    if ($appProvisioned -eq $true){
+        Write-Output "Removing Provision: $app" 
+        Get-AppXProvisionedPackage -Online | Where-Object DisplayName -eq $app | Remove-AppxProvisionedPackage -Online | Out-Null
+    }
     if ($appInstalled -eq $true){
-        Write-Output "Removing: $app"
-        Get-AppxPackage -Name $app | Remove-AppxPackage
+        Write-Output "Removing App: $app"   
         Get-AppxPackage -Name $app -AllUsers | Remove-AppxPackage -AllUsers
-        Get-AppXProvisionedPackage -Online |
-            Where-Object DisplayName -EQ $app |
-            Remove-AppxProvisionedPackage -Online
-        }
+    }
 }
