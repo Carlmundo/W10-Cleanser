@@ -1,5 +1,4 @@
-# Forked from: https://raw.githubusercontent.com/W4RH4WK/Debloat-Windows-10/master/scripts/remove-default-apps.ps1
-# Removes unwanted Apps that come with Windows. To avoid removing certain apps, comment out the corresponding lines below.
+# Initial list from https://raw.githubusercontent.com/W4RH4WK/Debloat-Windows-10/master/scripts/remove-default-apps.ps1
 
 $apps = @(
     # default Windows 10 apps
@@ -34,7 +33,6 @@ $apps = @(
     #"Microsoft.WindowsStore"
     #"Microsoft.XboxApp"
     #"Microsoft.XboxGameOverlay"
-    #"Microsoft.XboxIdentityProvider"
     #"Microsoft.XboxSpeechToTextOverlay"
     "Microsoft.ZuneMusic"
     "Microsoft.ZuneVideo"
@@ -74,7 +72,7 @@ $apps = @(
     "D52A8D61.FarmVille2CountryEscape"
     "TuneIn.TuneInRadio"
     "GAMELOFTSA.Asphalt8Airborne"
-    #"TheNewYorkTimes.NYTCrossword"
+    "TheNewYorkTimes.NYTCrossword"
     "DB6EA5DB.CyberLinkMediaSuiteEssentials"
     "Facebook.Facebook"
     "flaregamesGmbH.RoyalRevolt2"
@@ -86,7 +84,7 @@ $apps = @(
     "89006A2E.AutodeskSketchBook"
     "D5EA27B7.Duolingo-LearnLanguagesforFree"
     "46928bounde.EclipseManager"
-    "ActiproSoftwareLLC.562882FEEB491" # next one is for the Code Writer from Actipro Software LLC
+    "ActiproSoftwareLLC.562882FEEB491"
     "DolbyLaboratories.DolbyAccess"
     "SpotifyAB.SpotifyMusic"
     "A278AB0D.DisneyMagicKingdoms"
@@ -97,6 +95,8 @@ $apps = @(
     #"Microsoft.MicrosoftEdge"
     #"Microsoft.Windows.Cortana"
     #"Microsoft.WindowsFeedback"
+    #"Microsoft.XboxGameCallableUI"
+    #"Microsoft.XboxIdentityProvider"
     #"Windows.ContactSupport"
 
     #Added by W10 Cleanser
@@ -105,7 +105,7 @@ $apps = @(
     "king.com.BubbleWitch3Saga"
 )
 
-foreach ($app in $apps) {
+foreach ($app in $apps){
     $appInstalled = Get-AppxPackage $app | % {$_.Name -eq $app}
     $appProvisioned = Get-AppXProvisionedPackage -Online | % {$_.DisplayName -eq $app}
     if ($appProvisioned -eq $true){
@@ -116,4 +116,20 @@ foreach ($app in $apps) {
         Write-Output "Removing App: $app"   
         Get-AppxPackage -Name $app -AllUsers | Remove-AppxPackage
     }
+}
+
+#Unpin all apps from Start Menu
+#Export/read layout idea from: https://social.technet.microsoft.com/Forums/en-US/afd16053-7db0-4a44-9499-be61851661bf/clean-pinned-start-menu-apps-with-powershell?forum=win10itprogeneral
+$sysLanguage = Get-WinSystemLocale | Select DisplayName
+if ($sysLanguage.DisplayName -like "English*"){
+    Write-Output "Unpinning Start Menu apps..."
+    $outputStart = "$env:temp\startlayout.xml"
+    Export-StartLayout -path "$outputStart"
+    [xml]$layoutfile = Get-Content "$outputStart"
+    foreach ($item in $layoutfile.LayoutModificationTemplate.DefaultLayoutOverride.StartLayoutCollection.StartLayout.Group.DesktopApplicationTile.DesktopApplicationLinkPath){
+            $outputFile = Split-Path $item -leaf
+            $name = $outputFile.split('.') | Select-Object -first 1
+            ((New-Object -Com Shell.Application).NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').Items() | ?{$_.Name -eq $name}).Verbs() | ?{$_.Name.replace('&','') -match 'Unpin from Start'} | %{$_.DoIt()}  
+    }
+    Remove-Item -path "$outputStart"
 }
