@@ -59,13 +59,17 @@ $apps = @(
     "2FE3CB00.PicsArt-PhotoStudio"
     "46928bounde.EclipseManager"
     "4DF9E0F8.Netflix"
+    "5A894077.McAfeeSecurity"
+    "613EBCEA.PolarrPhotoEditorAcademicEdition"
     "6Wunderkinder.Wunderlist"
+    "7EE7776C.LinkedInforWindows"
     "828B5831.HiddenCityMysteryofShadows"
     "89006A2E.AutodeskSketchBook"
     "9E2F88E3.Twitter"
     "A278AB0D.DisneyMagicKingdoms"
     "A278AB0D.MarchofEmpires"
     "ActiproSoftwareLLC.562882FEEB491"
+    "CAF9E577.Plex"
     "ClearChannelRadioDigital.iHeartRadio"
     "D52A8D61.FarmVille2CountryEscape"
     "D5EA27B7.Duolingo-LearnLanguagesforFree"
@@ -73,13 +77,17 @@ $apps = @(
     "DolbyLaboratories.DolbyAccess"
     "Drawboard.DrawboardPDF"
     "Facebook.Facebook"
+    "Fitbit.FitbitCoach"
     "flaregamesGmbH.RoyalRevolt2"
     "Flipboard.Flipboard"
     "GAMELOFTSA.Asphalt8Airborne"
     "KeeperSecurityInc.Keeper"
     "king.com.BubbleWitch3Saga"
+    "king.com.CandyCrushFriends"
     "king.com.CandyCrushSaga"
     "king.com.CandyCrushSodaSaga"
+    "king.com.*"
+    "NORDCURRENT.COOKINGFEVER"
     "PandoraMediaInc.29680B314EFC2"
     "Playtika.CaesarsSlotsFreeCasino"
     "ShazamEntertainmentLtd.Shazam"
@@ -110,18 +118,11 @@ foreach ($app in $apps){
     }
 }
 
-#Unpin all apps from Start Menu
-#Export/read layout idea from: https://social.technet.microsoft.com/Forums/en-US/afd16053-7db0-4a44-9499-be61851661bf/clean-pinned-start-menu-apps-with-powershell?forum=win10itprogeneral
+#Wipe the Start Menu layout
 $sysLanguage = Get-WinSystemLocale | Select DisplayName
 if ($sysLanguage.DisplayName -like "English*"){
-    Write-Output "Unpinning Start Menu apps..."
-    $outputStart = "$env:temp\startlayout.xml"
-    Export-StartLayout -path "$outputStart"
-    [xml]$layoutfile = Get-Content "$outputStart"
-    foreach ($item in $layoutfile.LayoutModificationTemplate.DefaultLayoutOverride.StartLayoutCollection.StartLayout.Group.DesktopApplicationTile.DesktopApplicationLinkPath){
-            $outputFile = Split-Path $item -leaf
-            $name = $outputFile.split('.') | Select-Object -first 1
-            ((New-Object -Com Shell.Application).NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').Items() | ?{$_.Name -eq $name}).Verbs() | ?{$_.Name.replace('&','') -match 'Unpin from Start'} | %{$_.DoIt()}  
-    }
-    Remove-Item -path "$outputStart"
+    Write-Output "Resetting the Start Menu layout..."
+    (New-Object -Com Shell.Application).
+    NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').
+    Items() | %{ $_.Verbs() } | ?{$_.Name -match 'Un.*pin from Start'} | %{$_.DoIt()}
 }
