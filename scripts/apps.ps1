@@ -110,11 +110,12 @@ foreach ($app in $apps){
     $appProvisioned = Get-AppXProvisionedPackage -Online | % {$_.DisplayName -eq $app}
     if ($appProvisioned -eq $true){
         Write-Output "Removing Provision: $app" 
-        Get-AppXProvisionedPackage -Online | Where-Object DisplayName -eq $app | Remove-AppxProvisionedPackage -Online | Out-Null
+        Get-AppXProvisionedPackage -Online | Where-Object DisplayName -eq $app | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
     }
     if ($appInstalled -eq $true){
-        Write-Output "Removing App: $app"   
-        Get-AppxPackage -Name $app -AllUsers | Remove-AppxPackage
+        Write-Output "Removing App: $app"
+        Get-AppxPackage -Name $app | Remove-AppxPackage -ErrorAction SilentlyContinue
+        Get-AppxPackage -Name $app -AllUsers | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
     }
 }
 
