@@ -1,4 +1,4 @@
-﻿Windows Registry Editor Version 5.00
+Windows Registry Editor Version 5.00
 
 [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]
 "ContentDeliveryAllowed"=dword:00000000; Disable Content Delivery
