@@ -1,59 +1,63 @@
 # Initial list from https://raw.githubusercontent.com/W4RH4WK/Debloat-Windows-10/master/scripts/remove-default-apps.ps1
 
 $apps = @(
-    # Default / Forced Windows 10 apps
+    # Default Windows 10 apps
     "Microsoft.3DBuilder"
     "Microsoft.Advertising.Xaml"
     "Microsoft.Appconnector"
     "Microsoft.BingFinance"
-    "Microsoft.BingFoodAndDrink"
-    "Microsoft.BingHealthAndFitness"
     "Microsoft.BingNews"
     "Microsoft.BingSports"
     "Microsoft.BingTranslator"
-    "Microsoft.BingTravel"
     "Microsoft.BingWeather"
-    "Microsoft.CommsPhone"
-    "Microsoft.ConnectivityStore"
     "Microsoft.FreshPaint"
-    "Microsoft.GetHelp"
-    "Microsoft.Getstarted"
-    "Microsoft.Messaging"
-    "Microsoft.Microsoft3DViewer"
-    "Microsoft.Microsoft3DViewer"
     "Microsoft.MicrosoftOfficeHub"
     "Microsoft.MicrosoftPowerBIForWindows"
     "Microsoft.MicrosoftSolitaireCollection"
     "Microsoft.MinecraftUWP"
-    "Microsoft.MixedReality.Portal"
-    #"Microsoft.MSPaint"
+    "Microsoft.MicrosoftStickyNotes"
     "Microsoft.NetworkSpeedTest"
     "Microsoft.Office.OneNote"
-    "Microsoft.Office.Sway"
-    "Microsoft.OneConnect"
     "Microsoft.People"
     "Microsoft.Print3D"
-    "Microsoft.ScreenSketch"
     "Microsoft.SkypeApp"
-    #"Microsoft.MicrosoftStickyNotes"
     "Microsoft.Wallet"
     "Microsoft.WindowsAlarms"
     "Microsoft.WindowsCamera"
     "microsoft.windowscommunicationsapps"
-    "Microsoft.WindowsFeedbackHub"
     "Microsoft.WindowsMaps"
     "Microsoft.WindowsPhone"
-    #"Microsoft.Windows.Photos"
-    #"Microsoft.WindowsStore"
-    "Microsoft.WindowsReadingList"
     "Microsoft.WindowsSoundRecorder"
-    "Microsoft.YourPhone"
-    #"Microsoft.XboxApp"
-    #"Microsoft.XboxGameOverlay"
-    #"Microsoft.XboxGamingOverlay"
-    #"Microsoft.XboxSpeechToTextOverlay"
     "Microsoft.ZuneMusic"
     "Microsoft.ZuneVideo"
+    
+    # v1511
+    "Microsoft.CommsPhone"
+    "Microsoft.ConnectivityStore"
+    "Microsoft.GetHelp"
+    "Microsoft.Getstarted"
+    "Microsoft.Messaging"
+    "Microsoft.Office.Sway"
+    "Microsoft.OneConnect"
+    "Microsoft.WindowsFeedbackHub"
+
+    # v1607
+    "Microsoft.BingFoodAndDrink"
+    "Microsoft.BingTravel"
+    "Microsoft.BingHealthAndFitness"
+    "Microsoft.WindowsReadingList"
+
+    # v1703
+    "Microsoft.Microsoft3DViewer"
+    "Microsoft.MSPaint" #Paint3D
+
+    # v1809
+    "Microsoft.MixedReality.Portal"
+    "Microsoft.ScreenSketch"
+    "Microsoft.YourPhone"
+
+    # v2004
+    "Microsoft.549981C3F5F10" #Cortana
 
     # Third Party
     "2FE3CB00.PicsArt-PhotoStudio"
@@ -98,10 +102,22 @@ $apps = @(
     "WinZipComputing.WinZipUniversal"
     "XINGAG.XING"
 
-    # Unable to remove
+    # Removing any of these can cause issues
+    #"Microsoft.GamingServices"
+    #"Microsoft.WindowsStore"
+    #"Microsoft.XboxApp"
+    #"Microsoft.XboxGameOverlay"
+    #"Microsoft.XboxGamingOverlay"
+    #"Microsoft.XboxSpeechToTextOverlay"
+    #"Microsoft.Xbox.TCUI"
+
+    # Apps which cannot be removed using Remove-AppxPackage
+    #"Microsoft.BioEnrollment"
     #"Microsoft.MicrosoftEdge"
     #"Microsoft.Windows.Cortana"
     #"Microsoft.WindowsFeedback"
+    #"Microsoft.XboxGameCallableUI"
+    #"Microsoft.XboxIdentityProvider"
     #"Windows.ContactSupport"
 )
 
@@ -119,11 +135,62 @@ foreach ($app in $apps){
     }
 }
 
-#Wipe the Start Menu layout
-$sysLanguage = Get-WinSystemLocale | Select DisplayName
-if ($sysLanguage.DisplayName -like "English*"){
-    Write-Output "Resetting the Start Menu layout..."
-    (New-Object -Com Shell.Application).
-    NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').
-    Items() | %{ $_.Verbs() } | ?{$_.Name -match 'Un.*pin from Start'} | %{$_.DoIt()}
+# Reset Start Menu Layout
+# https://superuser.com/questions/1068382/how-to-remove-all-the-tiles-in-the-windows-10-start-menu/1442733#1442733
+Write-Output "Resetting Start Menu layout..."
+
+$START_MENU_LAYOUT = @"
+<LayoutModificationTemplate xmlns:defaultlayout="http://schemas.microsoft.com/Start/2014/FullDefaultLayout" xmlns:start="http://schemas.microsoft.com/Start/2014/StartLayout" Version="1" xmlns:taskbar="http://schemas.microsoft.com/Start/2014/TaskbarLayout" xmlns="http://schemas.microsoft.com/Start/2014/LayoutModification">
+    <LayoutOptions StartTileGroupCellWidth="6" />
+    <DefaultLayoutOverride>
+        <StartLayoutCollection>
+            <defaultlayout:StartLayout GroupCellWidth="6" />
+        </StartLayoutCollection>
+    </DefaultLayoutOverride>
+</LayoutModificationTemplate>
+"@
+
+$layoutFile="C:\Windows\StartMenuLayout.xml"
+
+#Delete layout file if it already exists
+If(Test-Path $layoutFile)
+{
+    Remove-Item $layoutFile
 }
+
+#Creates the blank layout file
+$START_MENU_LAYOUT | Out-File $layoutFile -Encoding ASCII
+
+$regAliases = @("HKLM", "HKCU")
+
+#Assign the start layout and force it to apply with "LockedStartLayout" at both the machine and user level
+foreach ($regAlias in $regAliases){
+    $basePath = $regAlias + ":\SOFTWARE\Policies\Microsoft\Windows"
+    $keyPath = $basePath + "\Explorer" 
+    IF(!(Test-Path -Path $keyPath)) { 
+        New-Item -Path $basePath -Name "Explorer"
+    }
+    Set-ItemProperty -Path $keyPath -Name "LockedStartLayout" -Value 1
+    Set-ItemProperty -Path $keyPath -Name "StartLayoutFile" -Value $layoutFile
+}
+
+#Restart Explorer, open the start menu (necessary to load the new layout), and give it a few seconds to process
+Stop-Process -name explorer
+Start-Sleep -s 5
+$wshell = New-Object -ComObject wscript.shell; $wshell.SendKeys('{ESCAPE}')
+Start-Sleep -s 5
+
+#Enable the ability to pin items again by disabling "LockedStartLayout"
+foreach ($regAlias in $regAliases){
+    $basePath = $regAlias + ":\SOFTWARE\Policies\Microsoft\Windows"
+    $keyPath = $basePath + "\Explorer" 
+    Set-ItemProperty -Path $keyPath -Name "LockedStartLayout" -Value 0
+}
+
+#Restart Explorer and delete the layout file
+Stop-Process -name explorer
+
+# Uncomment the next line to make clean start menu default for all new users
+#Import-StartLayout -LayoutPath $layoutFile -MountPath $env:SystemDrive\
+
+Remove-Item $layoutFile

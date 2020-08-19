@@ -1,7 +1,8 @@
 Windows Registry Editor Version 5.00
 
 [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]
-"ContentDeliveryAllowed"=dword:00000000; Disable Content Delivery
+"ContentDeliveryAllowed"=dword:00000000 ;Disable Content Delivery
+"FeatureManagementEnabled"=dword:00000000
 "OemPreInstalledAppsEnabled"=dword:00000000 ;Disable OEM Apps
 "PreInstalledAppsEnabled"=dword:00000000 ;Disable Promotional Apps
 "PreInstalledAppsEverEnabled"=dword:00000000
@@ -11,8 +12,11 @@ Windows Registry Editor Version 5.00
 ;Disable showing suggested apps
 "SubscribedContentEnabled"=dword:00000000
 "SubscribedContent-310093Enabled"=dword:00000000
+"SubscribedContent-314559Enabled"=dword:00000000
+"SubscribedContent-338387Enabled"=dword:00000000
 "SubscribedContent-338388Enabled"=dword:00000000
 "SubscribedContent-338389Enabled"=dword:00000000
+"SubscribedContent-338393Enabled"=dword:00000000
 
 [-HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager\SuggestedApps]
 
@@ -78,10 +82,15 @@ Windows Registry Editor Version 5.00
 [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Privacy]
 "TailoredExperiencesWithDiagnosticDataEnabled"=dword:00000000
 
-;Disable Windows Defender's automatic sample submission  and Spynet community membership
+;Windows Defender
+;Disable automatic sample submission and Spynet community membership
 [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet]
 "SubmitSamplesConsent"=dword:00000002
 "SpynetReporting"=dword:00000000
+
+;Disable notifications for scan summaries
+;[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Defender Security Center\Virus and threat protection]
+;"SummaryNotificationDisabled"=dword:00000001
 
 Disable Location Services
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}]
@@ -99,7 +108,6 @@ Disable Location Services
 
 ;Remove 3D Objects folder - v1709
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}]
-[-HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}]
 
 ;Disable People icon on taskbar
 [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People]
