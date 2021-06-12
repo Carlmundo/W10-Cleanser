@@ -48,6 +48,8 @@ echo - Windows Experience popup that appears after updates and from time to time
 echo - Notifications asking for Windows feedback
 echo - Windows Defender's automatic sample submission
 echo - Location services
+echo - 3D Objects folder
+echo - People and Weather icon/menus on the taskbar
 echo:
 echo These changes have also been made:
 echo - Windows Update will now only use peer to peer connections on the local network
