@@ -14,7 +14,7 @@ $apps = @(
     "Microsoft.MicrosoftOfficeHub"
     "Microsoft.MicrosoftPowerBIForWindows"
     "Microsoft.MicrosoftSolitaireCollection"
-    "Microsoft.MinecraftUWP"
+    #"Microsoft.MinecraftUWP"
     "Microsoft.MicrosoftStickyNotes"
     "Microsoft.NetworkSpeedTest"
     "Microsoft.Office.OneNote"
@@ -120,13 +120,13 @@ $apps = @(
     #"Microsoft.XboxIdentityProvider"
     #"Windows.ContactSupport"
 )
-
+$appxprovisionedpackage = Get-AppxProvisionedPackage -Online
 foreach ($app in $apps){
     $appInstalled = Get-AppxPackage $app | % {$_.Name -eq $app}
-    $appProvisioned = Get-AppXProvisionedPackage -Online | % {$_.DisplayName -eq $app}
+    $appProvisioned = $appxprovisionedpackage | % {$_.DisplayName -eq $app}
     if ($appProvisioned -eq $true){
         Write-Output "Removing Provision: $app" 
-        Get-AppXProvisionedPackage -Online | Where-Object DisplayName -eq $app | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
+        $appxprovisionedpackage | Where-Object DisplayName -eq $app | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
     }
     if ($appInstalled -eq $true){
         Write-Output "Removing App: $app"
